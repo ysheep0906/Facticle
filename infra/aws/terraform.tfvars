@@ -1,1 +1,1 @@
-# db_password = "your_secure_password"
+db_password = "Qwer1234!"

@@ -100,3 +100,65 @@ resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private.id
 }
+
+# RDS Subnet Group
+resource "aws_db_subnet_group" "rds_subnets" {
+  name       = "${var.project}-rds-subnet-group"
+  subnet_ids = aws_subnet.private[*].id
+
+  tags = {
+    Name = "${var.project}-rds-subnet-group"
+  }
+}
+
+# RDS Security Group
+resource "aws_security_group" "rds_sg" {
+  name   = "${var.project}-rds-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    description = "EKS NodeGroup access"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    security_groups = [
+      aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project}-rds-sg"
+  }
+}
+
+# OpenSearch Security Group
+resource "aws_security_group" "os_sg" {
+  name   = "${var.project}-os-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    description = "Allow access from EKS nodes"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    security_groups = [
+      aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
+    ]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+

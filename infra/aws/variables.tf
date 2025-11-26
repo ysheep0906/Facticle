@@ -29,13 +29,13 @@ variable "private_subnets" {
   default = ["10.0.3.0/24", "10.0.4.0/24"]
 }
 
-# variable "db_username" {
-#   type    = string
-#   default = "admin"
-# }
+variable "db_username" {
+  type    = string
+  default = "facticle_user"
+}
 
-# variable "db_password" {
-#   description = "RDS root password"
-#   type        = string
-#   sensitive   = true
-# }
+variable "db_password" {
+  description = "RDS root password"
+  type        = string
+  sensitive   = true
+}
