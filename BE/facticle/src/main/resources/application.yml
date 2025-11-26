@@ -5,3 +5,4 @@ spring:
       local: common
       docker: common
       test: common
+      aws: common
