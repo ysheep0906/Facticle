@@ -62,3 +62,23 @@ resource "aws_eks_addon" "kube_proxy" {
   resolve_conflicts_on_create  = "OVERWRITE"
   resolve_conflicts_on_update  = "OVERWRITE"
 }
+
+resource "null_resource" "wait_for_eks" { # EKS 클러스터와 노드 그룹이 준비될 때까지 대기
+  depends_on = [ 
+    aws_eks_cluster.cluster,
+    aws_eks_node_group.node_group
+  ]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.cluster.name}
+
+      until kubectl get nodes | grep -w "Ready"; do
+        echo "Nodes not ready yet. Retrying in 10s..."
+        sleep 10
+      done
+
+      kubectl wait --for=condition=Ready pods --all -n kube-system --timeout=300s
+    EOT
+  }
+}

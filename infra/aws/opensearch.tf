@@ -1,6 +1,6 @@
 resource "aws_opensearch_domain" "search" {
   domain_name = "${var.project}-search"
-
+  
   engine_version = "OpenSearch_2.9"
 
   cluster_config {

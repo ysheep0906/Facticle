@@ -79,10 +79,14 @@ resource "helm_release" "aws_load_balancer_controller" {
   chart      = "aws-load-balancer-controller"
 
   depends_on = [
+    null_resource.wait_for_eks,
+    aws_eks_cluster.cluster,
+    aws_eks_node_group.node_group,
+    aws_iam_openid_connect_provider.eks,
     kubernetes_service_account.alb_sa,
     aws_eks_addon.vpc_cni,
     aws_eks_addon.coredns,
-    aws_eks_addon.kube_proxy
+    aws_eks_addon.kube_proxy,
   ]
 
   set { # 필수 값 설정
@@ -103,5 +107,10 @@ resource "helm_release" "aws_load_balancer_controller" {
   set { # 리전 설정
     name  = "region"
     value = var.region
+  }
+
+  set { # VPC ID 설정
+    name  = "vpcId"
+    value = aws_vpc.main.id
   }
 }
