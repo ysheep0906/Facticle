@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "tfstate" {
   bucket = "facticle-terraform-state"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -35,6 +35,6 @@ resource "aws_dynamodb_table" "tf_lock" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
